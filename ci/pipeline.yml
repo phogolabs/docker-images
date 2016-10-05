@@ -1,0 +1,73 @@
+---
+groups:
+  - name: docker-images
+    jobs:
+    - build
+    - minor
+    - major
+
+jobs:
+ - name: build
+    public: true
+    serial: true
+    plan:
+      - get: docker-images
+        trigger: true
+      - put: experimental
+        params: { build: docker-images }
+
+  - name: minor
+    public: true
+    plan:
+      - get: version
+        trigger: false
+        params: {bump: minor}
+      - put: version
+        params:
+          file: {{docker-image-version-file}}
+
+  - name: major
+    public: true
+    plan:
+      - get: version
+        trigger: false
+        params: {bump: minor}
+      - put: version
+        params:
+          file: {{docker-image-version-file}}
+
+resources:
+  - name: docker-images
+    type: git
+    source:
+      uri: git@github.com:phogolabs/docker-images.git
+      branch: master
+      private_key: {{github-private-key}}
+
+ - name: version
+   type: semver
+   source:
+     driver: git
+     uri: git@github.com:phogolabs/docker-images.git
+     branch: version
+     file: version-ruby
+     initial_version: 0.0.1
+     private_key: {{github-private-key}}
+
+  - name: experimental
+    type: docker-image
+    source:
+      email: {{dockerhub-email}}
+      username: {{dockerhub-username}}
+      password: {{dockerhub-password}}
+      repository: {{dockerhub-image}}
+      tag: experimental
+
+  - name: latest
+    type: docker-image
+    source:
+      email: {{dockerhub-email}}
+      username: {{dockerhub-username}}
+      password: {{dockerhub-password}}
+      repository: {{dockerhub-image}}
+      tag: latest
