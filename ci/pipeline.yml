@@ -7,14 +7,15 @@ groups:
     - major
 
 jobs:
- - name: build
+  - name: build
     public: true
     serial: true
     plan:
       - get: docker-images
         trigger: true
       - put: experimental
-        params: { build: docker-images }
+        params:
+         build: {{docker-file-path}}
 
   - name: minor
     public: true
@@ -44,15 +45,15 @@ resources:
       branch: master
       private_key: {{github-private-key}}
 
- - name: version
-   type: semver
-   source:
-     driver: git
-     uri: git@github.com:phogolabs/docker-images.git
-     branch: version
-     file: version-ruby
-     initial_version: 0.0.1
-     private_key: {{github-private-key}}
+  - name: version
+    type: semver
+    source:
+      driver: git
+      uri: git@github.com:phogolabs/docker-images.git
+      branch: version
+      file: version-ruby
+      initial_version: 0.0.1
+      private_key: {{github-private-key}}
 
   - name: experimental
     type: docker-image
