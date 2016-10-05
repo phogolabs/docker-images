@@ -11,11 +11,15 @@ jobs:
     public: true
     serial: true
     plan:
-      - get: docker-images
+      - get: docker-file
         trigger: true
-      - put: experimental
+      - put: version
+        params: {pre: rc}
+      - put: docker-image
         params:
          build: {{docker-file-path}}
+         tag_prefix: "v"
+         tag: version/number
 
   - name: minor
     public: true
@@ -24,8 +28,7 @@ jobs:
         trigger: false
         params: {bump: minor}
       - put: version
-        params:
-          file: {{docker-image-version-file}}
+        params: {file: version/number}
 
   - name: major
     public: true
@@ -34,11 +37,10 @@ jobs:
         trigger: false
         params: {bump: minor}
       - put: version
-        params:
-          file: {{docker-image-version-file}}
+        params: {file: version/number}
 
 resources:
-  - name: docker-images
+  - name: docker-file
     type: git
     source:
       uri: git@github.com:phogolabs/docker-images.git
@@ -49,26 +51,17 @@ resources:
     type: semver
     source:
       driver: git
-      uri: git@github.com:phogolabs/docker-images.git
-      branch: version
-      file: version-ruby
+      git_user: {{git-bot-user}}
       initial_version: 0.0.1
+      uri: git@github.com:phogolabs/docker-images.git
       private_key: {{github-private-key}}
+      branch: version
+      file: {{docker-image-version-file}}
 
-  - name: experimental
+  - name: docker-image
     type: docker-image
     source:
       email: {{dockerhub-email}}
       username: {{dockerhub-username}}
       password: {{dockerhub-password}}
       repository: {{dockerhub-image}}
-      tag: experimental
-
-  - name: latest
-    type: docker-image
-    source:
-      email: {{dockerhub-email}}
-      username: {{dockerhub-username}}
-      password: {{dockerhub-password}}
-      repository: {{dockerhub-image}}
-      tag: latest
