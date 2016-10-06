@@ -17,11 +17,10 @@ jobs:
         trigger: true
       - put: version
         params: {pre: rc}
-      - put: docker-image
+      - put: docker-image-rc
+        resource: docker-image
         params:
          build: {{docker-file-path}}
-         get_params: {rootfs: true}
-         tag_prefix: "v"
          tag: version/number
 
   - name: promote
@@ -29,14 +28,18 @@ jobs:
     serial: true
     plan:
       - get: docker-image
+        params:
+         save: true
+         tag: version/number
         trigger: false
         passed: [build-rc]
-      - put: version
+      - get: version
         params: {bump: final}
-      - put: docker-image
+        passed: [build-rc]
+      - put: docker-image-final
+        resource: docker-image
         params:
-         import_file: docker-image/rootfs.tar
-         tag_prefix: "v"
+         load: docker-image
          tag: version/number
          tag_as_latest: true
 
