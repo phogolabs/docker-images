@@ -2,12 +2,14 @@
 groups:
   - name: docker-images
     jobs:
-    - build
+    - patch
     - minor
     - major
+    - build-rc
+    - promote
 
 jobs:
-  - name: build
+  - name: build-rc
     public: true
     serial: true
     plan:
@@ -18,8 +20,34 @@ jobs:
       - put: docker-image
         params:
          build: {{docker-file-path}}
+         get_params: {rootfs: true}
          tag_prefix: "v"
          tag: version/number
+
+  - name: promote
+    public: true
+    serial: true
+    plan:
+      - get: docker-image
+        trigger: false
+        passed: [build-rc]
+      - put: version
+        params: {bump: final}
+      - put: docker-image
+        params:
+         import_file: docker-image/rootfs.tar
+         tag_prefix: "v"
+         tag: version/number
+         tag_as_latest: true
+
+  - name: patch
+    public: true
+    plan:
+      - get: version
+        trigger: false
+        params: {bump: patch}
+      - put: version
+        params: {file: version/number}
 
   - name: minor
     public: true
