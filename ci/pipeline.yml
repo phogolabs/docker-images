@@ -5,45 +5,40 @@ groups:
     - patch
     - minor
     - major
-    - build-rc
+    - build
     - promote
 
 jobs:
-  - name: build-rc
+  - name: build
+    serial_groups: [build-image]
     public: true
     serial: true
     plan:
       - get: docker-file
         trigger: true
-      - put: version
-        params: {pre: rc}
-      - put: docker-image-rc
-        resource: docker-image
-        params:
-         build: {{docker-file-path}}
-         tag: version/number
+      - put: docker-image-experimental
+        params: {build: {{docker-file-path}}}
 
   - name: promote
+    serial_groups: [version, build-image]
     public: true
     serial: true
     plan:
-      - get: docker-image
-        params:
-         save: true
-         tag: version/number
-        trigger: false
-        passed: [build-rc]
+      - get: docker-image-experimental
+        params: {save: true}
+        passed: [build]
       - get: version
-        params: {bump: final}
-        passed: [build-rc]
-      - put: docker-image-final
-        resource: docker-image
+        trigger: true
+      - put: docker-image
         params:
-         load: docker-image
+         load: docker-image-experimental
+         load_file: docker-image-experimental/image
+         load_repository: {{dockerhub-image}}
+         load_tag: experimental
          tag: version/number
-         tag_as_latest: true
 
   - name: patch
+    serial_groups: [version]
     public: true
     plan:
       - get: version
@@ -53,6 +48,7 @@ jobs:
         params: {file: version/number}
 
   - name: minor
+    serial_groups: [version]
     public: true
     plan:
       - get: version
@@ -62,6 +58,7 @@ jobs:
         params: {file: version/number}
 
   - name: major
+    serial_groups: [version]
     public: true
     plan:
       - get: version
@@ -82,11 +79,11 @@ resources:
     type: semver
     source:
       driver: git
-      git_user: {{git-bot-user}}
-      initial_version: 0.0.1
       uri: git@github.com:phogolabs/docker-images.git
-      private_key: {{github-private-key}}
       branch: version
+      initial_version: 0.0.1
+      git_user: {{git-bot-user}}
+      private_key: {{github-private-key}}
       file: {{docker-image-version-file}}
 
   - name: docker-image
@@ -96,3 +93,13 @@ resources:
       username: {{dockerhub-username}}
       password: {{dockerhub-password}}
       repository: {{dockerhub-image}}
+      tag: latest
+
+  - name: docker-image-experimental
+    type: docker-image
+    source:
+      email: {{dockerhub-email}}
+      username: {{dockerhub-username}}
+      password: {{dockerhub-password}}
+      repository: {{dockerhub-image}}
+      tag: experimental
