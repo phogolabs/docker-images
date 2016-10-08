@@ -25,6 +25,7 @@ jobs:
     serial: true
     plan:
       - get: docker-image-experimental
+        trigger: false
         params: {save: true}
         passed: [build]
       - get: version
