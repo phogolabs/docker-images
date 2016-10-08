@@ -33,7 +33,7 @@ jobs:
         params:
          load: docker-image-experimental
          load_file: docker-image-experimental/image
-         load_repository: {{dockerhub-image}}
+         load_repository: {{docker-hub-image}}
          load_tag: experimental
          tag: version/number
 
@@ -82,24 +82,24 @@ resources:
       uri: git@github.com:phogolabs/docker-images.git
       branch: version
       initial_version: 0.0.1
-      git_user: {{git-bot-user}}
+      git_user: {{github-bot-user}}
       private_key: {{github-private-key}}
       file: {{docker-image-version-file}}
 
   - name: docker-image
     type: docker-image
     source:
-      email: {{dockerhub-email}}
-      username: {{dockerhub-username}}
-      password: {{dockerhub-password}}
-      repository: {{dockerhub-image}}
+      email: {{docker-hub-email}}
+      username: {{docker-hub-username}}
+      password: {{docker-hub-password}}
+      repository: {{docker-hub-image}}
       tag: latest
 
   - name: docker-image-experimental
     type: docker-image
     source:
-      email: {{dockerhub-email}}
-      username: {{dockerhub-username}}
-      password: {{dockerhub-password}}
-      repository: {{dockerhub-image}}
+      email: {{docker-hub-email}}
+      username: {{docker-hub-username}}
+      password: {{docker-hub-password}}
+      repository: {{docker-hub-image}}
       tag: experimental
