@@ -36,6 +36,7 @@ jobs:
          load_repository: {{docker-hub-image}}
          load_tag: experimental
          tag: version/number
+         tag_as_latest: true
 
   - name: patch
     serial_groups: [version]
@@ -93,7 +94,6 @@ resources:
       username: {{docker-hub-username}}
       password: {{docker-hub-password}}
       repository: {{docker-hub-image}}
-      tag: latest
 
   - name: docker-image-experimental
     type: docker-image
