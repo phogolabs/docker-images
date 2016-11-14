@@ -1,4 +1,4 @@
-FROM go:1.7.3
+FROM golang:1.7.3
 MAINTAINER engineering@phogolabs.com
 
 # UTF-8 SYSTEM LOCALE
