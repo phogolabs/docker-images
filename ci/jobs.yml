@@ -1,0 +1,9 @@
+---
+- name: build
+  plan:
+    - get: docker-images
+      trigger: true
+    - put: docker-hub
+      params: 
+        build: "{{docker-file-path}}"
+        tag_as_latest: true
