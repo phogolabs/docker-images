@@ -22,7 +22,7 @@ def configure_resources(config)
 end
 
 def configure_docker_hub_resource(resource, config)
-  resource['name'] = "docker-image-#{config['pipeline-name']}"
+  resource['name'] = config['pipeline-name']
   resource['source']['repository'] = config['docker-hub-image']
   resource
 end
@@ -32,13 +32,13 @@ def configure_jobs(config)
   pipeline_name = config['pipeline-name']
   pipeline_jobs = YAML.load_file(expand_path('jobs.yml'))
   pipeline_jobs.each do |job|
-    job['name'] = "build-docker-image-#{pipeline_name}"
+    job['name'] = "build-#{pipeline_name}"
 
     docker_hub_job = job['plan'].find do |task|
       task['put'] == 'docker-hub'
     end
 
-    docker_hub_job['put'] = "docker-image-#{pipeline_name}"
+    docker_hub_job['put'] = pipeline_name
     docker_hub_job['params']['build'] = "docker-images/#{pipeline_name}"
 
     jobs << job.to_h
