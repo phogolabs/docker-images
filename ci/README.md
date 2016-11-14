@@ -9,4 +9,11 @@ that generates a pipeline manifests that depends on the current images.
 fly -t phogo set-pipeline -p docker-images -c <(./script/generate-manifest) --load-vars-from=secrets.yml
 ```
 
-MI
+`generate-manifest` script generates a pipelien for all root folders that
+contain `config.yml` with the following structure:
+
+```yaml
+---
+pipeline-name: "ruby"
+docker-hub-image: "phogo/ruby"
+```
