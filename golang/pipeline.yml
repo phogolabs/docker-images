@@ -1,0 +1,28 @@
+---
+resources:
+- name: docker-hub-golang
+  type: docker-image
+  source:
+    email: "{{docker-hub-email}}"
+    username: "{{docker-hub-username}}"
+    password: "{{docker-hub-password}}"
+    repository: phogo/golang 
+
+- name: docker-images-golang
+  type: git
+  source:
+    uri: git@github.com:phogolabs/docker-images.git
+    paths: ["golang/*"]
+    branch: master
+    private_key: "{{git-private-key}}"
+
+jobs:
+- name: build-golang-docker-image
+  max_in_flight: 1
+  plan:
+    - get: docker-images-golang
+      trigger: true
+    - put: docker-hub-golang
+      params: 
+        build: docker-images-golang/golang
+        tag_as_latest: true

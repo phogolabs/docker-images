@@ -1,0 +1,28 @@
+---
+resources:
+- name: docker-hub-ruby
+  type: docker-image
+  source:
+    email: "{{docker-hub-email}}"
+    username: "{{docker-hub-username}}"
+    password: "{{docker-hub-password}}"
+    repository: phogo/ruby 
+
+- name: docker-images-ruby
+  type: git
+  source:
+    uri: git@github.com:phogolabs/docker-images.git
+    paths: ["ruby/*"]
+    branch: master
+    private_key: "{{git-private-key}}"
+
+jobs:
+- name: build-ruby-docker-image
+  max_in_flight: 1
+  plan:
+    - get: docker-images-ruby
+      trigger: true
+    - put: docker-hub-ruby
+      params: 
+        build: docker-images-ruby/ruby
+        tag_as_latest: true

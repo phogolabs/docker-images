@@ -1,3 +1,0 @@
----
-pipeline-name: "golang"
-docker-hub-image: "phogo/golang"

@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+
+def merge_pipeline_manifests
+  manifest = Hash.new
+
+  Dir.glob(File.expand_path('../*/pipeline.yml', __dir__)) do |config|
+    pipeline_config = YAML.load_file(config)
+    manifest = manifest.merge(pipeline_config) do |key, old_value, new_value|
+      (old_value + new_value).uniq
+    end
+  end
+
+  group_jobs = manifest.fetch('jobs').map do |job|
+    job['name']
+  end
+
+  manifest['groups'] = [{ "name" => 'docker-images', "jobs" => group_jobs }]
+  manifest
+end
+
+puts merge_pipeline_manifests.to_yaml.gsub('"', '')

@@ -1,3 +1,0 @@
----
-pipeline-name: "ruby"
-docker-hub-image: "phogo/ruby"
