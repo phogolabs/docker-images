@@ -1,0 +1,28 @@
+---
+resources:
+- name: docker-hub-blog
+  type: docker-image
+  source:
+    email: "{{docker-hub-email}}"
+    username: "{{docker-hub-username}}"
+    password: "{{docker-hub-password}}"
+    repository: phogo/blog 
+
+- name: docker-images-blog
+  type: git
+  source:
+    uri: git@github.com:phogolabs/docker-images.git
+    paths: ["blog/*"]
+    branch: master
+    private_key: "{{git-private-key}}"
+
+jobs:
+- name: build-blog-docker-image
+  max_in_flight: 1
+  plan:
+    - get: docker-images-blog
+      trigger: true
+    - put: docker-hub-blog
+      params: 
+        build: docker-images-blog/blog
+        tag_as_latest: true
