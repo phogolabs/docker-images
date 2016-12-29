@@ -5,11 +5,11 @@ MAINTAINER engineering@phogolabs.com
 # https://oncletom.io/2015/docker-encoding/
 ENV LANG C.UTF-8
 
-RUN gem install bundler
-RUN gem install nokogiri
-RUN gem install rspec
-RUN gem install capybara
-RUN gem install webmock
-RUN gem install rake
-RUN gem install rack
-RUN gem install sinatra
+RUN gem install bundler --no-ri --no-rdoc
+RUN gem install nokogiri --no-ri --no-rdoc
+RUN gem install rspec --no-ri --no-rdoc
+RUN gem install capybara --no-ri --no-rdoc
+RUN gem install webmock --no-ri --no-rdoc
+RUN gem install rake --no-ri --no-rdoc
+RUN gem install rack --no-ri --no-rdoc
+RUN gem install sinatra --no-ri --no-rdoc
