@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ruby:2.3.3
 MAINTAINER Phogo Labs <engineering@phogolabs.com>
 
 # UTF-8 SYSTEM LOCALE
@@ -37,17 +37,11 @@ RUN go get github.com/progrium/basht
 # Install Ruby
 ###################
 
-ENV RUBY_VERSION 2.3.3
-
-RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-RUN curl -L https://get.rvm.io | bash -s stable
-
-RUN /bin/bash -l -c "rvm install ${RUBY_VERSION}"
-RUN /bin/bash -l -c "gem install bundler"
-RUN /bin/bash -l -c "gem install nokogiri"
-RUN /bin/bash -l -c "gem install rspec"
-RUN /bin/bash -l -c "gem install capybara"
-RUN /bin/bash -l -c "gem install webmock"
-RUN /bin/bash -l -c "gem install rake"
-RUN /bin/bash -l -c "gem install rack"
-RUN /bin/bash -l -c "gem install sinatra"
+RUN gem install bundler
+RUN gem install nokogiri
+RUN gem install rspec
+RUN gem install capybara
+RUN gem install webmock
+RUN gem install rake
+RUN gem install rack
+RUN gem install sinatra
