@@ -1,0 +1,53 @@
+FROM ubuntu:xenial
+MAINTAINER Phogo Labs <engineering@phogolabs.com>
+
+# UTF-8 SYSTEM LOCALE
+# https://oncletom.io/2015/docker-encoding/
+ENV LANG C.UTF-8
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get -qq update
+RUN apt-get -qq install  -y --no-install-recommends bash jq git ca-certificates curl ansible
+RUN rm -rf /var/lib/apt/lists/*
+RUN update-ca-certificates -v
+
+# Install Hugo to generate new blog content
+ENV HUGO_VERSION 0.17
+ENV HUGO_BINARY hugo_${HUGO_VERSION}-64bit.deb
+
+ADD https://github.com/spf13/hugo/releases/download/v${HUGO_VERSION}/${HUGO_BINARY} /tmp/hugo.deb
+RUN dpkg -i /tmp/hugo.deb	&& rm /tmp/hugo.deb
+
+#################
+# Install Golang
+#################
+ENV GOLANG_VERSION 1.7.4
+
+ADD https://storage.googleapis.com/golang/go${GOLANG_VERSION}.linux-amd64.tar.gz /tmp/golang.tar.gz
+RUN tar -C /usr/local -xzf /tmp/golang.tar.gz && rm /tmp/golang.tar.gz
+
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+
+RUN go get github.com/progrium/basht
+
+###################
+# Install Ruby
+###################
+
+ENV RUBY_VERSION 2.3.3
+
+RUN gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+RUN curl -L https://get.rvm.io | bash -s stable
+
+RUN /bin/bash -l -c "rvm install ${RUBY_VERSION}"
+RUN /bin/bash -l -c "gem install bundler"
+RUN /bin/bash -l -c "gem install nokogiri"
+RUN /bin/bash -l -c "gem install rspec"
+RUN /bin/bash -l -c "gem install capybara"
+RUN /bin/bash -l -c "gem install webmock"
+RUN /bin/bash -l -c "gem install rake"
+RUN /bin/bash -l -c "gem install rack"
+RUN /bin/bash -l -c "gem install sinatra"

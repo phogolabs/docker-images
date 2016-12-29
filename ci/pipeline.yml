@@ -1,0 +1,28 @@
+---
+resources:
+- name: docker-image-ci
+  type: docker-image
+  source:
+    email: "{{docker-hub-email}}"
+    username: "{{docker-hub-username}}"
+    password: "{{docker-hub-password}}"
+    repository: phogo/ci
+
+- name: dockerfile-ci
+  type: git
+  source:
+    uri: git@github.com:phogolabs/docker-images.git
+    paths: ["ci/*"]
+    branch: master
+    private_key: "{{git-private-key}}"
+
+jobs:
+- name: build-docker-image-ci
+  max_in_flight: 1
+  plan:
+    - get: dockerfile-ci
+      trigger: true
+    - put: docker-image-ci
+      params: 
+        build: dockerfile-ci/ci
+        tag_as_latest: true
