@@ -7,8 +7,8 @@ ENV LANG C.UTF-8
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" >> /etc/apt/sources.list
 RUN apt-get -qq update
+RUN echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" >> /etc/apt/sources.list
 RUN apt-get -qq install  -y --no-install-recommends bash jq git ca-certificates curl ansible
 RUN rm -rf /var/lib/apt/lists/*
 RUN update-ca-certificates -v
